@@ -14,7 +14,7 @@ const Index = () => {
             <div className="p-2 rounded-full bg-gradient-to-r from-primary to-trust-blue">
               <Heart className="h-6 w-6 text-primary-foreground" />
             </div>
-            <h1 className="text-2xl font-bold text-foreground">HealthCare+</h1>
+            <h1 className="text-2xl font-bold text-foreground">Swasthya Sathi</h1>
           </div>
           <Link to="/login">
             <Button variant="medical">Get Started</Button>
@@ -105,7 +105,7 @@ const Index = () => {
           <CardContent className="p-8 text-center">
             <h3 className="text-2xl font-bold mb-4">Ready to Take Control of Your Health?</h3>
             <p className="text-muted-foreground mb-6">
-              Join thousands of users who trust HealthCare+ for their medical needs
+              Join thousands of users who trust Swasthya Sathi for their medical needs
             </p>
             <Link to="/login">
               <Button variant="medical" size="lg">
@@ -119,7 +119,7 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="container mx-auto px-4 py-8 text-center text-muted-foreground">
-        <p>&copy; 2024 HealthCare+. Your trusted health companion.</p>
+        <p>&copy; 2024 Swasthya Sathi. Your trusted health companion.</p>
       </footer>
     </div>
   );
