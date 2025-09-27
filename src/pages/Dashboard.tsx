@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { 
   Stethoscope, 
   MapPin, 
@@ -12,13 +13,21 @@ import {
   User,
   Bell,
   Settings,
-  Activity
+  Activity,
+  LogOut
 } from 'lucide-react';
 import heroImage from '@/assets/healthcare-hero.jpg';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { generateHealthId } from '@/lib/supabase';
 
 const Dashboard = () => {
-  const userName = "John Doe"; // TODO: Get from auth context
-  const healthId = "HL-2024-789456"; // TODO: Get from user profile
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || "User";
+  const healthId = user?.user_metadata?.health_id || generateHealthId();
 
   const services = [
     {
@@ -63,6 +72,23 @@ const Dashboard = () => {
     }
   ];
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of your account.",
+      });
+      navigate('/');
+    } catch (error) {
+      toast({
+        title: "Error signing out",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent to-secondary">
       {/* Header */}
@@ -82,9 +108,21 @@ const Dashboard = () => {
             <Button variant="ghost" size="sm">
               <Bell className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm">
-              <Settings className="h-4 w-4" />
-            </Button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
             <div className="flex items-center gap-2">
               <div className="p-2 rounded-full bg-accent">
                 <User className="h-4 w-4 text-accent-foreground" />
