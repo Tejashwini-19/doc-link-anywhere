@@ -105,9 +105,54 @@ const Dashboard = () => {
           </div>
           
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm">
-              <Bell className="h-4 w-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="relative">
+                  <Bell className="h-4 w-4" />
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs bg-destructive text-destructive-foreground flex items-center justify-center">
+                    3
+                  </Badge>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80 bg-background border border-border shadow-lg">
+                <div className="p-4 border-b border-border">
+                  <h3 className="font-semibold text-foreground">Notifications</h3>
+                  <p className="text-sm text-muted-foreground">You have 3 unread notifications</p>
+                </div>
+                <div className="max-h-64 overflow-y-auto">
+                  <DropdownMenuItem className="flex items-start gap-3 p-4 border-b border-border">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                      <Stethoscope className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Symptom Check Reminder</p>
+                      <p className="text-xs text-muted-foreground">Weekly health check-up is due</p>
+                      <p className="text-xs text-muted-foreground mt-1">2 hours ago</p>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-start gap-3 p-4 border-b border-border">
+                    <div className="w-8 h-8 rounded-full bg-healing-green/20 flex items-center justify-center flex-shrink-0">
+                      <Video className="h-4 w-4 text-healing-green" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Telemedicine Appointment</p>
+                      <p className="text-xs text-muted-foreground">Dr. Smith appointment in 1 hour</p>
+                      <p className="text-xs text-muted-foreground mt-1">1 day ago</p>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-start gap-3 p-4">
+                    <div className="w-8 h-8 rounded-full bg-trust-blue/20 flex items-center justify-center flex-shrink-0">
+                      <FileText className="h-4 w-4 text-trust-blue" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Medical Records Updated</p>
+                      <p className="text-xs text-muted-foreground">New lab results available</p>
+                      <p className="text-xs text-muted-foreground mt-1">3 days ago</p>
+                    </div>
+                  </DropdownMenuItem>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -115,7 +160,7 @@ const Dashboard = () => {
                   <Settings className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="bg-background border border-border shadow-lg">
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign Out
