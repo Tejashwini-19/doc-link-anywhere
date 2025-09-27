@@ -19,66 +19,75 @@ import {
   Heart
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import LocationMap from '@/components/LocationMap';
+import { useLocation } from '@/hooks/useLocation';
+import { useNotifications } from '@/hooks/useNotifications';
 
 const Hospitals = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const { location, loading, getCurrentLocation } = useLocation();
+  const { scheduleEmergencyAlert } = useNotifications();
 
   const mockHospitals = [
     {
       id: 1,
       name: "City General Hospital",
       type: "Multi-specialty",
-      distance: "0.8 km",
+      latitude: 28.6139,
+      longitude: 77.2090,
       rating: 4.5,
       status: "available",
       beds: 15,
       waitTime: "10-15 min",
       emergency: true,
-      phone: "+1-234-567-8900",
-      address: "123 Medical Center Dr",
+      phone: "+91-11-2345-6789",
+      address: "123 Medical Center Dr, New Delhi",
       specialties: ["Emergency", "Cardiology", "Neurology"]
     },
     {
       id: 2,
       name: "Central Primary Health Center",
       type: "PHC",
-      distance: "1.2 km",
+      latitude: 28.6129,
+      longitude: 77.2295,
       rating: 4.2,
       status: "busy",
       beds: 5,
       waitTime: "25-30 min",
       emergency: false,
-      phone: "+1-234-567-8901",
-      address: "456 Health St",
+      phone: "+91-11-2345-6790",
+      address: "456 Health St, New Delhi",
       specialties: ["General Medicine", "Pediatrics"]
     },
     {
       id: 3,
       name: "MediCare Emergency Center",
       type: "Emergency",
-      distance: "2.1 km",
+      latitude: 28.6169,
+      longitude: 77.2085,
       rating: 4.8,
       status: "available",
       beds: 8,
       waitTime: "5-10 min",
       emergency: true,
-      phone: "+1-234-567-8902",
-      address: "789 Emergency Ave",
+      phone: "+91-11-2345-6791",
+      address: "789 Emergency Ave, New Delhi",
       specialties: ["Emergency", "Trauma", "Critical Care"]
     },
     {
       id: 4,
       name: "Community Health Clinic",
       type: "Clinic",
-      distance: "1.8 km",
+      latitude: 28.6149,
+      longitude: 77.2190,
       rating: 4.0,
       status: "full",
       beds: 0,
       waitTime: "45+ min",
       emergency: false,
-      phone: "+1-234-567-8903",
-      address: "321 Community Rd",
+      phone: "+91-11-2345-6792",
+      address: "321 Community Rd, New Delhi",
       specialties: ["General Medicine", "Preventive Care"]
     }
   ];
@@ -108,6 +117,19 @@ const Hospitals = () => {
     { id: 'phc', label: 'PHCs' },
     { id: 'clinic', label: 'Clinics' }
   ];
+
+  const handleEmergencyCall = async (hospital: any) => {
+    await scheduleEmergencyAlert(`Emergency call initiated to ${hospital.name}`);
+    window.open(`tel:${hospital.phone}`, '_self');
+  };
+
+  const handleCall = (hospital: any) => {
+    window.open(`tel:${hospital.phone}`, '_self');
+  };
+
+  const handleUseLocation = async () => {
+    await getCurrentLocation();
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent to-secondary">
@@ -145,9 +167,9 @@ const Hospitals = () => {
                   className="pl-10"
                 />
               </div>
-              <Button variant="medical" size="sm">
+              <Button variant="medical" size="sm" onClick={handleUseLocation} disabled={loading}>
                 <Navigation className="h-4 w-4 mr-2" />
-                Use My Location
+                {loading ? "Getting Location..." : "Use My Location"}
               </Button>
             </div>
             
@@ -189,7 +211,10 @@ const Hospitals = () => {
                         <span>{hospital.type}</span>
                         <span className="flex items-center gap-1">
                           <MapPin className="h-3 w-3" />
-                          {hospital.distance}
+                          {location ? 
+                            `${((Math.sqrt(Math.pow(hospital.latitude - location.latitude, 2) + Math.pow(hospital.longitude - location.longitude, 2)) * 111).toFixed(1))} km` :
+                            'Distance unknown'
+                          }
                         </span>
                         <span className="flex items-center gap-1">
                           <Star className="h-3 w-3 fill-current text-yellow-500" />
@@ -235,12 +260,12 @@ const Hospitals = () => {
                       <Route className="h-4 w-4 mr-1" />
                       Directions
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => handleCall(hospital)}>
                       <Phone className="h-4 w-4 mr-1" />
                       Call
                     </Button>
                     {hospital.emergency && (
-                      <Button variant="emergency" size="sm">
+                      <Button variant="emergency" size="sm" onClick={() => handleEmergencyCall(hospital)}>
                         <Ambulance className="h-4 w-4 mr-1" />
                         Emergency
                       </Button>
@@ -251,22 +276,15 @@ const Hospitals = () => {
             ))}
           </div>
 
-          {/* Map Placeholder & Quick Actions */}
+          {/* Map & Quick Actions */}
           <div className="space-y-6">
-            {/* Map */}
-            <Card className="shadow-card border-0">
-              <CardHeader>
-                <CardTitle className="text-base">Live Map</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="aspect-square bg-accent/50 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">Interactive map loading...</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Interactive Map */}
+            <LocationMap 
+              hospitals={mockHospitals} 
+              onHospitalSelect={(hospital) => {
+                console.log('Selected hospital:', hospital);
+              }}
+            />
 
             {/* Quick Actions */}
             <Card className="shadow-card border-0">
@@ -274,9 +292,9 @@ const Hospitals = () => {
                 <CardTitle className="text-base">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="emergency" className="w-full" size="sm">
+                <Button variant="emergency" className="w-full" size="sm" onClick={() => handleEmergencyCall({ name: 'Emergency Services', phone: '108' })}>
                   <Ambulance className="h-4 w-4 mr-2" />
-                  Call Emergency (911)
+                  Call Emergency (108)
                 </Button>
                 <Button variant="healing" className="w-full" size="sm">
                   <Heart className="h-4 w-4 mr-2" />
